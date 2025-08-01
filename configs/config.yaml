@@ -1,0 +1,74 @@
+general:
+    name: 'graph_dit'
+    wandb: 'disabled' 
+    gpus: 4
+    resume: null
+    test_only: null
+    sample_every_val: 100
+    samples_to_generate: 256      
+    samples_to_save: 3
+    chains_to_save: 1
+    log_every_steps: 10
+    number_chain_steps: 8
+    final_model_samples_to_generate: 10000
+    final_model_samples_to_save: 20
+    final_model_chains_to_save: 1
+    enable_progress_bar: True
+    save_model: True
+    num_sanity_val_steps: 0
+num_rel: 12
+ent_dim: 16
+model:
+    type: 'discrete'
+    transition: 'marginal'                  
+    model: 'graph_dit'
+    diffusion_steps: 2
+    diffusion_noise_schedule: 'loglinear'
+    # diffusion_noise_schedule: 'loglinear'cosine
+    guide_scale: 2
+    hidden_size: 512
+    depth: 3
+    num_heads: 8
+    mlp_ratio: 4
+    drop_condition: 0.00001
+    lambda_train: [1, 10]  
+    ensure_connected: True
+    ydim: 2
+    Xdim: 16
+    Edim: 16
+    max_n_nodes: 180
+    loss_type: 'cross_entropy'
+    unit_sample: True
+    support_flag: True
+    onehot: True
+    softmax: True
+    distance: 'none'
+    max_distance: 8
+
+train:
+    n_epochs: 30
+    batch_size: 100
+    lr: 0.001
+    clip_grad: null
+    num_workers: 0
+    weight_decay: 0
+    seed: 0
+    val_check_interval: null
+    check_val_every_n_epoch: 2
+sample:
+    first_hitting: True
+lr_scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  T_max: 2000  
+
+test:
+    batch_size: 128
+dataset:
+    datadir: 'CFamily/data'
+    task_name: null
+    guidance_target: null
+    pin_memory: False
+    num_workers: 8
+    repeat: 100
+    ratio: 0.8
+    first_inverse: True
