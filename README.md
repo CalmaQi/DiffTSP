@@ -13,7 +13,7 @@ This code was developed and tested with Python 3.9, PyTorch 2.0.0, and PyG 2.3.0
 
 ## Usage
 
-We could train the model on an 4090 GPU card. Here is an example to running the code:
+We could train the model on one 4090 GPU. Here is an example to running the code:
 
 
 
