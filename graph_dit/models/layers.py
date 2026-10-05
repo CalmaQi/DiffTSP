@@ -45,7 +45,7 @@ class Attention(nn.Module):
         x = attn_sfmx @ v
         return x, attn
     
-    def forward(self, x, node_mask):
+    def forward(self, x, node_mask, attn_bias=None):
         B, N, D = x.shape
         
         # B, head, N, head_dim
@@ -53,8 +53,20 @@ class Attention(nn.Module):
         q, k, v = qkv.unbind(0) # B, head, N, head_dim
         q, k = self.q_norm(q), self.k_norm(k)
         
-        attn_mask = (node_mask[:, None, :, None] & node_mask[:, None, None, :]).expand(-1, self.num_heads, N, N).clone()
-        attn_mask[attn_mask.sum(-1) == 0] = True
+        valid_attn_mask = (
+            node_mask[:, None, :, None] & node_mask[:, None, None, :]
+        ).expand(-1, self.num_heads, N, N).clone()
+        valid_attn_mask[valid_attn_mask.sum(-1) == 0] = True
+
+        if attn_bias is not None:
+            # attn_bias: [B, 1, N, N], broadcast across attention heads
+            attn_mask = attn_bias.to(dtype=q.dtype)
+            attn_mask = attn_mask.masked_fill(
+                ~valid_attn_mask,
+                torch.finfo(q.dtype).min,
+            )
+        else:
+            attn_mask = valid_attn_mask
 
         x = F.scaled_dot_product_attention(
             q, k, v,
