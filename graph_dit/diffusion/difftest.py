@@ -93,31 +93,8 @@ def filter_topk_edges(pred, threshold, mask_prob,step=None):
     pred_flat = pred.view(B, -1)  # (B, N*N*DIM)
     # 计算每个 batch 要保留的边数
     num_edges = (pred_flat > threshold).sum(dim=1)
-    if step<10:
-      topk = (num_edges * (1 - mask_prob.squeeze())).long().clamp(min=1)  # 至少保留1个
-      # topk = (num_edges * (1)).long().clamp(max=1)  # 至少保留1个
-    elif step<30:
-      topk = (num_edges * (1 - mask_prob.squeeze())).long().clamp(min=1)  # 至少保留1个
-      # topk = (num_edges * (1 - mask_prob.squeeze())).long().clamp(min=1,max=1)  # 至少保留1个
-    elif step<40:
-      topk = (num_edges * (1 - mask_prob.squeeze())).long().clamp(min=1)  # 至少保留1个
-      # topk = (num_edges * (1 - mask_prob.squeeze())).long().clamp(min=1,max=1)  # 至少保留1个
-    elif step>47: 
-      topk = (num_edges * (1 - mask_prob.squeeze())).long().clamp(min=1)  # 至少保留1个
-      # topk = (num_edges * (1 - mask_prob.squeeze())).long().clamp(min=1,max=1)  # 至少保留1个
-    else:
-      topk = (num_edges * (1 - mask_prob.squeeze())).long().clamp(max=1)  # 至少保留1个
-    # 取每个batch的topk索引
-    # topk = (num_edges)
-    topk_mask = torch.zeros_like(pred_flat, dtype=torch.bool)
-    for i in range(B):  
-      if topk[i] > 0:
-        idx = torch.topk(pred_flat[i], topk[i], sorted=False).indices
-        topk_mask[i, idx] = True
-    # 还原形状
     topk_mask = topk_mask.view_as(pred)
     return topk_mask
-    return topk_mask & (pred > threshold)
   
 def symmetrize_pred_matrix_vectorized(pred, rel_num):
     """
