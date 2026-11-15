@@ -1,4 +1,4 @@
-One Pass for All: A Discrete Diffusion Model for Knowledge Graph Triple Set Prediction
+DiffTSP: Conditional Discrete Diffusion Based Knowledge Graph Triple Set Prediction
 ================================================================
 
 
